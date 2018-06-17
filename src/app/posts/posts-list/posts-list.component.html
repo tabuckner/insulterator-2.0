@@ -6,8 +6,11 @@
         <mat-expansion-panel-header>
           {{ post.title }}
         </mat-expansion-panel-header>
+        <div class="post-image">
+          <img [src]="post.imagePath" [alt]="post.title">
+        </div>
         <p>{{ post.content }}</p>
-        <mat-action-row>
+        <mat-action-row *ngIf="userIsAuthenticated">
           <button
             mat-button
             color="primary"
@@ -24,3 +27,9 @@
     <p class="mat-body-1 text-center">No posts added yet.</p>
   </ng-template>
 </ng-container>
+<mat-paginator
+  [length]="totalPosts"
+  [pageSize]="postsPerPage"
+  [pageSizeOptions]="pageSizeOptions"
+  (page)="onChangedPage($event)"
+  *ngIf="posts && posts.length > 0"></mat-paginator>

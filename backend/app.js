@@ -1,13 +1,17 @@
+const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 
 const postsRoutes = require('./routes/posts');
+const userRoutes = require('./routes/users');
 
 const app = express();
 
 // temporarypassword
-mongoose.connect('mongodb+srv://tbuckner:temporarypassword@cluster0-2jqk7.mongodb.net/test?retryWrites=true') // TODO: Replace test with correct DB name.
+// mongoose.connect('mongodb+srv://tbuckner:temporarypassword@cluster0-2jqk7.mongodb.net/test?retryWrites=true') // FIXME: Removed query params to avoid cyclic error in Mongo
+// More Info: https://github.com/Automattic/mongoose/issues/6109
+mongoose.connect('mongodb+srv://tbuckner:temporarypassword@cluster0-2jqk7.mongodb.net/test') // TODO: Replace test with correct DB name.
   .then(() => {
     console.log('Connected to Database...');
   })
@@ -16,6 +20,7 @@ mongoose.connect('mongodb+srv://tbuckner:temporarypassword@cluster0-2jqk7.mongod
   });
 
 app.use(bodyParser.json());
+app.use('/images', express.static(path.join('backend/images'))); // Forward /images to /backend/images
 
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -27,5 +32,6 @@ app.use((req, res, next) => {
 });
 
 app.use('/api/posts', postsRoutes);
+app.use('/api/users', userRoutes);
 
 module.exports = app;

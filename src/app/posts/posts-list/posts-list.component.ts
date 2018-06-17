@@ -2,6 +2,8 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { Post } from '../post.model';
 import { PostsService } from '../posts.service';
+import { PageEvent } from '@angular/material';
+import { AuthService } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-posts-list',
@@ -10,27 +12,52 @@ import { PostsService } from '../posts.service';
 })
 export class PostsListComponent implements OnInit, OnDestroy {
   posts: Post[] = [];
-  postSub: Subscription;
   isLoading = false;
+  userIsAuthenticated = false;
+  totalPosts = 0;
+  currentPage = 1;
+  postsPerPage = 2;
+  pageSizeOptions = [1, 2, 5, 10];
+  private postSub: Subscription;
+  private authSub: Subscription;
 
-  constructor(private postsService: PostsService) { }
+  constructor(
+    private postsService: PostsService,
+    private authService: AuthService) { }
 
   ngOnInit() {
     this.isLoading = true;
-    this.postsService.getPosts();
+    this.postsService.getPosts(this.postsPerPage, 1);
     this.postSub = this.postsService.getPostUpdateListener()
-      .subscribe((posts: Post[]) => {
+      .subscribe((postData: {posts: Post[], totalPosts: number}) => {
         this.isLoading = false;
-        this.posts = posts;
+        this.totalPosts = postData.totalPosts;
+        this.posts = postData.posts;
+      });
+    this.userIsAuthenticated = this.authService.getIsAuthenticated();
+    this.authSub = this.authService.getAuthStatusListener()
+      .subscribe(isAuthenticated => {
+        this.userIsAuthenticated = isAuthenticated;
       });
   }
 
   ngOnDestroy() {
     this.postSub.unsubscribe();
+    this.authSub.unsubscribe();
   }
 
   onDelete(id: string) {
-    this.postsService.deletePost(id);
+    this.isLoading = true;
+    this.postsService.deletePost(id).subscribe(() => {
+      this.postsService.getPosts(this.postsPerPage, this.currentPage);
+    });
+  }
+
+  onChangedPage(pageData: PageEvent) {
+    this.isLoading = true;
+    this.currentPage = pageData.pageIndex + 1;
+    this.postsPerPage = pageData.pageSize;
+    this.postsService.getPosts(this.postsPerPage, this.currentPage);
   }
 
 }
