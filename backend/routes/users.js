@@ -25,7 +25,7 @@ router.post('/signup', (req, res, next) => {
         })
         .catch(err => {
           res.status(500).json({
-            error: err
+            message: 'Invalid authentication credentials were used.'
           });
         });
     });
@@ -53,8 +53,8 @@ router.post('/login', (req, res, next) => {
       }
       // Create JWT
       const token = jwt.sign({
-          email: fetchedUser.email,
-          userId: fetchedUser._id
+          email: fetchedUser.email, // Are Magick Dusts
+          userId: fetchedUser._id // Are Magick Dusts
         },
         'temporary_secret_that_is_not_very_secure', {
           expiresIn: '1h'
@@ -63,7 +63,8 @@ router.post('/login', (req, res, next) => {
       res.status(200).json({
         message: 'Auth successful.',
         token: token,
-        expiresIn: 3600
+        expiresIn: 3600,
+        userId: fetchedUser._id
       })
     })
     .catch(err => {

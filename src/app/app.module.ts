@@ -10,11 +10,15 @@ import { PostsModule } from './posts/posts.module';
 import { HeaderComponent } from './header/header.component';
 import { AuthModule } from './auth/auth.module';
 import { AuthInterceptor } from './auth/auth-interceptor';
+import { ErrorInterceptor } from './error-interceptor';
+import { ErrorComponent } from './error/error.component';
+import { MatDialogModule } from '@angular/material';
 
 @NgModule({
   declarations: [
     AppComponent,
-    HeaderComponent
+    HeaderComponent,
+    ErrorComponent // Move To a Diff Module?
   ],
   imports: [
     BrowserModule,
@@ -24,10 +28,13 @@ import { AuthInterceptor } from './auth/auth-interceptor';
     SharedModule,
     PostsModule,
     AuthModule,
+    MatDialogModule, // Move To A Diff Module?
   ],
   providers: [
-    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true }
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  entryComponents: [ErrorComponent]
 })
 export class AppModule { }

@@ -36,26 +36,41 @@ const Post = require('../models/post');
  */
 const checkAuth = require('../middleware/check-auth');
 
-router.post('', checkAuth, multer({storage: storageConfig}).single('image'), (req, res, next) => {
+router.post(
+  '',
+  checkAuth,
+  multer({ storage: storageConfig }).single('image'),
+  (req, res, next) => {
   const url = `${req.protocol}://${req.get('host')}`
   const post = new Post({
     title: req.body.title,
     content: req.body.content,
-    imagePath: `${url}/images/${req.file.filename}`
+    imagePath: `${url}/images/${req.file.filename}`,
+    creator: req.userData.userId // The Fire for The Magic Cauldron
   });
-  post.save().then(createdPost => {
-    console.log(post);
-    res.status(201).json({
-      message: 'Post added successfully.',
-      post: {
-        ...createdPost,
-        id: createdPost._id
-      }
+  post.save()
+    .then(createdPost => {
+      console.log(post);
+      res.status(201).json({
+        message: 'Post added successfully.',
+        post: {
+          ...createdPost,
+          id: createdPost._id
+        }
+      });
+    })
+    .catch(error => {
+      res.status(500).json({
+        message: 'Creating a post has failed.'
+      });
     });
-  });
 });
 
-router.patch('/:id', checkAuth, multer({storage: storageConfig}).single('image'), (req, res, next) => {
+router.patch(
+  '/:id',
+  checkAuth,
+  multer({storage: storageConfig}).single('image'),
+  (req, res, next) => {
   let imagePath = req.body.imagePath;
   if (req.file) {
     const url = `${req.protocol}://${req.get('host')}`
@@ -65,14 +80,15 @@ router.patch('/:id', checkAuth, multer({storage: storageConfig}).single('image')
     _id: req.params.id,
     title: req.body.title,
     content: req.body.content,
-    imagePath: imagePath
+    imagePath: imagePath,
+    creator: req.userData.userId
   });
-  Post.updateOne( { _id: req.params.id }, updatedPost)
+  Post.updateOne( { _id: req.params.id, creator: req.userData.userId }, updatedPost)
     .then(result => {
       console.log(result.nModified);
-      if (result.nModified === 1) {
+      if (result.nModified > 0 ) {
       return res.status(200).json({
-          message: 'Updated post successfully',
+          message: 'Updated post successfully.',
         });
       }
       if (result.nModified === 0 && result.n === 1) {
@@ -81,10 +97,15 @@ router.patch('/:id', checkAuth, multer({storage: storageConfig}).single('image')
         });
       }
       if (result.n === 0) {
-        return res.status(404).json({
-          message: 'No mataches found.',
+        return res.status(401).json({
+          message: 'Not Authorized.',
         });
       }
+    })
+    .catch(error => {
+      res.status(500).json({
+        messge: 'Couldn\'t update post.'
+      });
     });
 });
 
@@ -112,31 +133,54 @@ router.get('', (req, res, next) => {
         posts: fetchedPosts,
         totalPosts: count
       });
+    })
+    .catch(error => {
+      res.status(500).json({
+        message: 'Fetching posts failed.'
+      });
     });
 });
 
 router.delete('/:id', checkAuth, (req, res, next) => {
   const id = req.params.id;
   console.log(`Attempting to delete post: ${id}`);
-  Post.deleteOne({ _id: id })
-    .then(() => {
-      res.status(200).json({
-        message: `Post ${id} deleted.`
+  Post.deleteOne({ _id: id, creator: req.userData.userId })
+    .then((result) => {
+      console.log(result);
+      if (result.n > 0) {
+        res.status(200).json({
+          message: `Post successfully deleted.`
+        });
+      } else {
+        res.status(401).json({
+          message: 'Not Authorized.',
+        });
+      }
+    })
+    .catch(error => {
+      res.status(500).json({
+        message: 'Unable to delete post.'
       });
     });
 });
 
 router.get('/:id', (req, res, next) => {
   const id = req.params.id
-  Post.findById(id).then((post) => {
-    if (post) {
-      res.status(200).json(post);
-    } else {
-      res.status(404).json({
-        message: 'Post not found.'
+  Post.findById(id)
+    .then((post) => {
+      if (post) {
+        res.status(200).json(post);
+      } else {
+        res.status(404).json({
+          message: 'Post not found.'
+        });
+      }
+    })
+    .catch(error => {
+      res.status(500).json({
+        message: 'Fetching posts failed.'
       });
-    }
-  });
+    });;
 });
 
 module.exports = router;

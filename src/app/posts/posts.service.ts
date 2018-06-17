@@ -31,13 +31,15 @@ export class PostsService {
               id: post._id,
               title: post.title,
               content: post.content,
-              imagePath: post.imagePath
+              imagePath: post.imagePath,
+              creator: post.creator
             };
           }),
           totalPosts: postData.totalPosts
         };
       }))
       .subscribe((transPostData) => {
+        console.log(transPostData);
         this.posts = transPostData.posts;
         this.postsUpdated.next({
           posts: [...this.posts],
@@ -60,7 +62,7 @@ export class PostsService {
   }
 
   getPost(id: string) {
-    return this.http.get<{ _id: string, title: string, content: string, imagePath: string }>(
+    return this.http.get<{ _id: string, title: string, content: string, imagePath: string, creator: string }>(
       `http://localhost:3000/api/posts/${id}`
     ); // DONT SUBSCRIBE HERE>
   }
@@ -78,7 +80,8 @@ export class PostsService {
         id: id,
         title: title,
         content: content,
-        imagePath: image
+        imagePath: image,
+        creator: null
       };
     }
     this.http.patch<{ message: string }>(`http://localhost:3000/api/posts/${id}`, postData)

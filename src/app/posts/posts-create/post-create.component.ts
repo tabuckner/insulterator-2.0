@@ -1,28 +1,36 @@
-import { Component, OnInit, EventEmitter, Output } from '@angular/core';
+import { Component, OnInit, EventEmitter, Output, OnDestroy } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { mimeType } from './mime-type.validator';
 import { PostsService } from '../posts.service';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { Post } from '../post.model';
+import { Subscription } from 'rxjs';
+import { AuthService } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-post-create',
   templateUrl: './post-create.component.html',
   styleUrls: ['./post-create.component.css'],
 })
-export class PostCreateComponent implements OnInit {
+export class PostCreateComponent implements OnInit, OnDestroy {
   public activePost: Post;
   public isLoading = false;
   public form: FormGroup;
   public imagePreview: string;
   private mode = 'create';
   private activePostId: string;
+  private authSub: Subscription;
 
   constructor(
     private postsService: PostsService,
-    private route: ActivatedRoute) { }
+    private route: ActivatedRoute,
+    private authService: AuthService) { }
 
   ngOnInit() {
+    this.authSub = this.authService.getAuthStatusListener()
+      .subscribe(authStatus => {
+        this.isLoading = false;
+      });
     this.form = new FormGroup({
       'title': new FormControl(null, { validators: [Validators.required] }),
       'content': new FormControl(null, { validators: [Validators.required] }),
@@ -40,7 +48,8 @@ export class PostCreateComponent implements OnInit {
             id: postData._id,
             title: postData.title,
             content: postData.content,
-            imagePath: postData.imagePath
+            imagePath: postData.imagePath,
+            creator: postData.creator
           };
           this.form.setValue({
             'title': this.activePost.title,
@@ -82,5 +91,9 @@ export class PostCreateComponent implements OnInit {
         this.form.value.image
       );
     }
+  }
+
+  ngOnDestroy() {
+    this.authSub.unsubscribe();
   }
 }
