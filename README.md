@@ -1,9 +1,25 @@
-# MeanBasic
+# Insulterator 2.0
+
+First full stack app. Angular Material MEAN app. 
+
+Uses:
+* Angular 6
+* Angular Material
+* Express
+* MongoDB Atlas
+* Mongoose
+* A Lowered Self Esteem
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 6.0.8.
 
 ## Development server
 
+### Express
+```
+npm run start:server
+```
+
+### Angular
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
 
 ## Code scaffolding
