@@ -19,7 +19,8 @@ mongoose.connect(`mongodb+srv://tbuckner:${process.env.MONGO_ATLASS_PW}@cluster0
   });
 
 app.use(bodyParser.json());
-app.use('/images', express.static(path.join('backend/images'))); // Forward /images to /backend/images
+// app.use('/images', express.static(path.join('backend/images'))); // Forward /images to /backend/images
+app.use('/', express.static(path.join(__dirname, 'angular'))); // Forward /images to /backend/images
 
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -30,5 +31,8 @@ app.use((req, res, next) => {
 
 app.use('/api/posts', postsRoutes);
 app.use('/api/users', userRoutes);
+app.use((req, res, next) => {
+  res.sendFile(path.join(__dirname, 'angular', 'index.html'));
+});
 
 module.exports = app;

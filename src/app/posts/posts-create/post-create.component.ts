@@ -35,7 +35,7 @@ export class PostCreateComponent implements OnInit, OnDestroy {
       'title': new FormControl(null, { validators: [Validators.required] }),
       'content': new FormControl(null, { validators: [Validators.required] }),
       // tslint:disable-next-line:max-line-length
-      'image': new FormControl(null, { validators: [Validators.required], asyncValidators: [mimeType] }), // TODO: Remove required validator.
+      // 'image': new FormControl(null, { validators: [Validators.required], asyncValidators: [mimeType] }), // TODO: Remove required validator.
     });
     this.route.paramMap.subscribe((paramMap: ParamMap) => {
       if (paramMap.has('id')) {

@@ -5,12 +5,15 @@ const Post = require('../models/post');
 
 exports.createPost = (req, res, next) => {
   const url = `${req.protocol}://${req.get('host')}`
+  console.log(req.body);
   const post = new Post({
     title: req.body.title,
     content: req.body.content,
-    imagePath: `${url}/images/${req.file.filename}`,
+    // imagePath: `${url}/images/${req.file.filename}`,
+    // imagePath: null,
     creator: req.userData.userId // The Fire for The Magic Cauldron
   });
+  console.log(post);
   post.save()
     .then(createdPost => {
       console.log(post);
@@ -30,16 +33,16 @@ exports.createPost = (req, res, next) => {
 };
 
 exports.updatePost = (req, res, next) => {
-  let imagePath = req.body.imagePath;
-  if (req.file) {
-    const url = `${req.protocol}://${req.get('host')}`
-    imagePath = `${url}/images/${req.file.filename}`
-  }
+  // let imagePath = req.body.imagePath;
+  // if (req.file) {
+  //   const url = `${req.protocol}://${req.get('host')}`
+  //   imagePath = `${url}/images/${req.file.filename}`
+  // }
   const updatedPost = new Post({
     _id: req.params.id,
     title: req.body.title,
     content: req.body.content,
-    imagePath: imagePath,
+    // imagePath: imagePath,
     creator: req.userData.userId
   });
   Post.updateOne({
