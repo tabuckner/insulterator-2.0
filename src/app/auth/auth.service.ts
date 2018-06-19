@@ -3,6 +3,9 @@ import { HttpClient } from '@angular/common/http';
 import { AuthModule } from './auth.module';
 import { Subject } from 'rxjs';
 import { Router } from '@angular/router';
+import { environment } from '../../environments/environment';
+
+const BACKEND_URL = `${environment.apiUrl}/users`;
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -33,7 +36,7 @@ export class AuthService {
   createUser(email: string, password: string) {
     const authData: AuthModule = { email, password };
     this.http
-      .post('http://localhost:3000/api/users/signup', authData)
+      .post(`${BACKEND_URL}/signup`, authData)
       .subscribe(response => {
         this.router.navigate(['/']);
         // TODO: Add snackbar.
@@ -45,7 +48,7 @@ export class AuthService {
   logIn(email: string, password: string) {
     const authData: AuthModule = { email, password };
     this.http
-      .post<{ message: string, token: string, expiresIn: number, userId: string }>('http://localhost:3000/api/users/login', authData)
+      .post<{ message: string, token: string, expiresIn: number, userId: string }>(`${BACKEND_URL}/login`, authData)
       .subscribe(response => {
         if (response.token) {
           const expiresInDuration = response.expiresIn;

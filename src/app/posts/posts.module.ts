@@ -14,10 +14,6 @@ import { PostsListComponent } from './posts-list/posts-list.component';
     CommonModule,
     SharedModule,
     RouterModule
-  ],
-  exports: [
-    PostCreateComponent,
-    PostsListComponent
   ]
 })
 export class PostsModule { }

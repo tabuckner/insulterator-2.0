@@ -1,0 +1,6 @@
+{
+  "env": {
+    "MONGO_ATLASS_PW": "temporarypassword",
+    "JWT_KEY": "temporary_secret_that_is_not_very_secure"
+  }
+}

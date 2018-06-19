@@ -8,10 +8,9 @@ const userRoutes = require('./routes/users');
 
 const app = express();
 
-// temporarypassword
-// mongoose.connect('mongodb+srv://tbuckner:temporarypassword@cluster0-2jqk7.mongodb.net/test?retryWrites=true') // FIXME: Removed query params to avoid cyclic error in Mongo
+// mongoose.connect(`mongodb+srv://tbuckner:${process.env.MONGO_ATLASS_PW}@cluster0-2jqk7.mongodb.net/test`) // FIXME: Removed query params to avoid cyclic error in Mongo
 // More Info: https://github.com/Automattic/mongoose/issues/6109
-mongoose.connect('mongodb+srv://tbuckner:temporarypassword@cluster0-2jqk7.mongodb.net/test') // TODO: Replace test with correct DB name.
+mongoose.connect(`mongodb+srv://tbuckner:${process.env.MONGO_ATLASS_PW}@cluster0-2jqk7.mongodb.net/test`) // TODO: Replace test with correct DB name.
   .then(() => {
     console.log('Connected to Database...');
   })
@@ -26,9 +25,7 @@ app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, PUT, DELETE, OPTIONS');
-  setTimeout(() => {
-    next();
-  }, 500); // For testing loading
+  next();
 });
 
 app.use('/api/posts', postsRoutes);
