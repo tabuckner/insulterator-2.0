@@ -11,6 +11,7 @@ Uses:
 * Express
 * MongoDB Atlas
 * Mongoose
+* JWT Authentication
 * A Lowered Self Esteem
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 6.0.8.
